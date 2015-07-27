@@ -16,11 +16,11 @@ public final class Migrator {
 
     private static final String MIGRATION_TABLE_NAME = "Migrations";
 
-    private static final String APPLIED_MIGRATIONS_QUERYSTRING = "SELECT \"id\" from \"?\"";
+    private static final String APPLIED_MIGRATIONS_QUERYSTRING = "SELECT \"id\" from \"" + MIGRATION_TABLE_NAME +"\"";
 
 //    private static final String MIGRATION_TABLE_EXISTS_QUERYSTRING = "SELECT EXISTS(SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = ? and c.relname = ?)";//TODO: Most likely not needed
 
-    private static final String CREATE_MIGRATION_TABLE_QUERYSTRING = "CREATE TABLE IF NOT EXISTS ? (id uuid, name character varying, PRIMARY KEY(id))";
+    private static final String CREATE_MIGRATION_TABLE_QUERYSTRING = "CREATE TABLE IF NOT EXISTS \"" + MIGRATION_TABLE_NAME + "\" (id uuid, name character varying, PRIMARY KEY(id))";
 
     private Map<UUID, AbstractMigration> migrations;//Map for fast indexing based on the UUID
 
@@ -61,11 +61,12 @@ public final class Migrator {
      * @throws SQLException
      */
     public void run(Connection conn) throws SQLException {
-        //Determine which migrations have been applied to the database
-        markAppliedMigrations(conn);
 
         //Ensure that the database has the Migration metadata required to perform
+        validateMigrationsTable(conn);
 
+        //Determine which migrations have been applied to the database
+        markAppliedMigrations(conn);
 
         //Get all migrations that have not been applied to the database
         List<AbstractMigration> migrationsNotApplied = getMigrationsNotApplied();
@@ -153,10 +154,9 @@ public final class Migrator {
         conn.commit();
     }
 
-    public void validateMigrationsTable(Connection conn)throws SQLException{//FIXME: Make private after testing
+    private void validateMigrationsTable(Connection conn)throws SQLException{//FIXME: Make private after testing
         //Create migration table if it does not exist
         PreparedStatement pstmt = conn.prepareStatement(CREATE_MIGRATION_TABLE_QUERYSTRING);
-        pstmt.setString(1, MIGRATION_TABLE_NAME);
         try{
             pstmt.executeUpdate();
         }catch(SQLException sqle){

@@ -22,8 +22,8 @@ public class Main {
         try {
             conn = source.getConnection("nge", "nge");
 
-//            migrator.run(conn);
-            migrator.validateMigrationsTable(conn);
+            migrator.run(conn);
+//            migrator.validateMigrationsTable(conn);
         } catch (SQLException e) {
             e.printStackTrace();
         }finally{
@@ -33,8 +33,5 @@ public class Main {
                 //TODO: Log exception
             }
         }
-
-
-//        System.out.println(ReflectionTest.getSerialVersionUID());
     }
 }
