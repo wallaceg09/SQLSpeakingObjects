@@ -1,4 +1,4 @@
-package com.company;
+package com.company.migration;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -7,7 +7,10 @@ import java.util.UUID;
 /**
  * Created by Glen on 7/26/2015.
  */
-public abstract class Migration {
+//TODO: Add methods that will handle standard DDL commands
+    //eg: Table.update(), Table.addColumns()
+//TODO: Convert connections to pooled connections
+public abstract class AbstractMigration {
 
     /**
      *
@@ -17,6 +20,11 @@ public abstract class Migration {
     //TODO: Date?
 
     private boolean applied;//Should not be persisted to the database.
+
+    public AbstractMigration(String name){
+        this.id = UUID.randomUUID();
+        this.name = name;
+    }
 
     /**
      * Returns the unique identifier associated with this Migration.

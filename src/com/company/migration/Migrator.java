@@ -1,4 +1,4 @@
-package com.company;
+package com.company.migration;
 
 import java.io.Serializable;
 import java.sql.Connection;
@@ -9,16 +9,17 @@ import java.util.*;
 /**
  * Created by Glen on 7/26/2015.
  */
-public class Migrator {
+//TODO: Convert connections to pooled connections
+public final class Migrator {
 
     private static final String APPLIED_MIGRATIONS_QUERYSTRING = "SELECT \"id\" from \"Migrations\"";
 
-    private Map<UUID, Migration> migrations;//Map for fast indexing based on the UUID
+    private Map<UUID, AbstractMigration> migrations;//Map for fast indexing based on the UUID
 
     private List<Serializable> objects;//TODO: This should take a Class<Serializable>, not an instanced object
 
     public Migrator(){
-        this.migrations = new HashMap<UUID, Migration>();
+        this.migrations = new HashMap<UUID, AbstractMigration>();
         this.objects = new ArrayList<Serializable>();
     }
 
@@ -27,7 +28,7 @@ public class Migrator {
      *
      * @param migration
      */
-    public void registerMigration(Migration migration){
+    public void registerMigration(AbstractMigration migration){
         if(migrations.get(migration.getUUID()) == null){
             migrations.put(migration.getUUID(), migration);
         }
@@ -45,7 +46,8 @@ public class Migrator {
     }
 
     /**
-     * Migrates the database based on the registered migrations
+     * Migrates the database based on the registered {@link AbstractMigration}s.
+     * NOTE: This method does NOT close the connection. The connection must be closed in a higher scope.
      *
      * @param conn Connection to a data source
      * @throws SQLException
@@ -54,8 +56,11 @@ public class Migrator {
         //Determine which migrations have been applied to the database
         markAppliedMigrations(conn);
 
+        //Ensure that the database has the Migration metadata required to perform
+
+
         //Get all migrations that have not been applied to the database
-        List<Migration> migrationsNotApplied = getMigrationsNotApplied();
+        List<AbstractMigration> migrationsNotApplied = getMigrationsNotApplied();
 
         //Apply all migrations that have not been applied to the database
         applyMigrations(conn, migrationsNotApplied);
@@ -67,10 +72,10 @@ public class Migrator {
      * @return List of migrations that need to be applied to the database
      * @throws SQLException
      */
-    private List<Migration> getMigrationsNotApplied() {
-        LinkedList<Migration> migrationsNotApplied = new LinkedList<Migration>();
+    private List<AbstractMigration> getMigrationsNotApplied() {
+        LinkedList<AbstractMigration> migrationsNotApplied = new LinkedList<AbstractMigration>();
 
-        for(Migration migration : migrations.values()){
+        for(AbstractMigration migration : migrations.values()){
             if(!migration.isApplied()){
                 migrationsNotApplied.add(migration);
             }
@@ -105,12 +110,12 @@ public class Migrator {
      * @param migrationsNotApplied List of migrations that have not been applied to the database
      * @throws SQLException
      */
-    private void applyMigrations(Connection conn, List<Migration> migrationsNotApplied)throws SQLException{
+    private void applyMigrations(Connection conn, List<AbstractMigration> migrationsNotApplied)throws SQLException{
         conn.setAutoCommit(false);
-        for(Migration migration : migrationsNotApplied){
+        for(AbstractMigration migration : migrationsNotApplied){
             try{
                 //Apply migration
-                migration.up();
+                migration.up(conn);
             }catch (SQLException sqle){
                 //Rollback and throw an exception if there is an error
                 conn.rollback();
@@ -120,5 +125,10 @@ public class Migrator {
         }
         conn.commit();
     }
+
+    private void validateMetadataTables(Connection conn)throws SQLException{
+        
+    }
+
 }
 
