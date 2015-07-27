@@ -20,16 +20,18 @@ public class Main {
 
         Connection conn = null;
         try {
-            conn = source.getConnection();
+            conn = source.getConnection("nge", "nge");
 
-            migrator.run(conn);
+//            migrator.run(conn);
+            migrator.validateMigrationsTable(conn);
         } catch (SQLException e) {
-            if (conn != null) try {
-                conn.close();
-            } catch (SQLException e1) {
-                e1.printStackTrace();
-            }
             e.printStackTrace();
+        }finally{
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                //TODO: Log exception
+            }
         }
 
 

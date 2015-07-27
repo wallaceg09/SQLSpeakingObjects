@@ -2,6 +2,7 @@ package com.company.migration;
 
 import java.io.Serializable;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -10,9 +11,16 @@ import java.util.*;
  * Created by Glen on 7/26/2015.
  */
 //TODO: Convert connections to pooled connections
+//TODO: Create Migrator interface, and then refacter this name to PostGresMigrator or summat
 public final class Migrator {
 
-    private static final String APPLIED_MIGRATIONS_QUERYSTRING = "SELECT \"id\" from \"Migrations\"";
+    private static final String MIGRATION_TABLE_NAME = "Migrations";
+
+    private static final String APPLIED_MIGRATIONS_QUERYSTRING = "SELECT \"id\" from \"?\"";
+
+//    private static final String MIGRATION_TABLE_EXISTS_QUERYSTRING = "SELECT EXISTS(SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = ? and c.relname = ?)";//TODO: Most likely not needed
+
+    private static final String CREATE_MIGRATION_TABLE_QUERYSTRING = "CREATE TABLE IF NOT EXISTS ? (id uuid, name character varying, PRIMARY KEY(id))";
 
     private Map<UUID, AbstractMigration> migrations;//Map for fast indexing based on the UUID
 
@@ -93,14 +101,30 @@ public final class Migrator {
     private void markAppliedMigrations(Connection conn) throws SQLException {
         conn.setAutoCommit(false);
         //Get the migrations that have already been applied to the database
-        ResultSet rset = conn.prepareStatement(APPLIED_MIGRATIONS_QUERYSTRING).executeQuery();
-
-        //Mark every migration that has been applied
-        while(rset.next()){
-            UUID id = (UUID)rset.getObject(1);
-            migrations.get(id).setApplied(true);
+        PreparedStatement pstmt = conn.prepareStatement(APPLIED_MIGRATIONS_QUERYSTRING);
+        try{
+            ResultSet rset = pstmt.executeQuery();
+            try{
+                //Mark every migration that has been applied
+                while(rset.next()){
+                    UUID id = (UUID)rset.getObject(1);
+                    migrations.get(id).setApplied(true);
+                }
+            }catch(SQLException sqle){
+                throw new SQLException(sqle);
+            }finally{
+                rset.close();
+            }
+        }catch(SQLException sqle){
+            throw new SQLException(sqle);
+        }finally{
+            try{
+                pstmt.close();
+            }
+            catch (SQLException sqle){
+                //TODO: Log exception
+            }
         }
-        rset.close();
     }
 
     /**
@@ -111,23 +135,39 @@ public final class Migrator {
      * @throws SQLException
      */
     private void applyMigrations(Connection conn, List<AbstractMigration> migrationsNotApplied)throws SQLException{
+
         conn.setAutoCommit(false);
         for(AbstractMigration migration : migrationsNotApplied){
             try{
                 //Apply migration
                 migration.up(conn);
+
+                //Log migration in migration file
             }catch (SQLException sqle){
                 //Rollback and throw an exception if there is an error
                 conn.rollback();
                 throw new SQLException(sqle);
             }
-
         }
+
         conn.commit();
     }
 
-    private void validateMetadataTables(Connection conn)throws SQLException{
-        
+    public void validateMigrationsTable(Connection conn)throws SQLException{//FIXME: Make private after testing
+        //Create migration table if it does not exist
+        PreparedStatement pstmt = conn.prepareStatement(CREATE_MIGRATION_TABLE_QUERYSTRING);
+        pstmt.setString(1, MIGRATION_TABLE_NAME);
+        try{
+            pstmt.executeUpdate();
+        }catch(SQLException sqle){
+            throw new SQLException(sqle);
+        }finally{
+            try{
+                pstmt.close();
+            }catch(SQLException sqle){
+                //TODO: Log exception
+            }
+        }
     }
 
 }

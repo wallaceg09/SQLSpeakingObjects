@@ -1,8 +1,10 @@
 package com.company.Migrations;
 
 import com.company.migration.AbstractMigration;
+import javafx.embed.swt.SWTFXUtils;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.UUID;
 
@@ -22,6 +24,17 @@ public class TestMigration extends AbstractMigration{
     @Override
     public void up(Connection conn) throws SQLException {
         String createQueryString = "CREATE TABLE IF NOT EXISTS \"TestMigration\" (ID serial, COLUMN1 real, COLUMN2 decimal, PRIMARY KEY (ID))";
-        conn.prepareStatement(createQueryString).execute();
+        PreparedStatement pstmt = conn.prepareStatement(createQueryString);
+        try{
+            pstmt.executeUpdate();
+        }catch(SQLException sqle){
+            throw new SQLException(sqle);
+        }finally {
+            try{
+                pstmt.close();
+            }catch(SQLException sqle){
+                //TODO: Log exception
+            }
+        }
     }
 }
