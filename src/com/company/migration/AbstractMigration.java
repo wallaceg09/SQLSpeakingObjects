@@ -46,7 +46,7 @@ public abstract class AbstractMigration {
 
     /**
      * Set whether or not the migration has already been applied to the database.
-     * This method is package-private because it should only be called by the {@link Migrator}that
+     * This method is package-private because it should only be called by the {@link PostGreSQLMigrator}that
      * handles this migration.
      * @param applied
      */

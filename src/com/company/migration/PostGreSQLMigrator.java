@@ -12,7 +12,7 @@ import java.util.*;
  */
 //TODO: Convert connections to pooled connections
 //TODO: Create Migrator interface, and then refacter this name to PostGresMigrator or summat
-public final class Migrator {
+public final class PostGreSQLMigrator implements IMigrator{
 
     private static final String MIGRATION_TABLE_NAME = "Migrations";
 
@@ -26,7 +26,7 @@ public final class Migrator {
 
     private List<Serializable> objects;//TODO: This should take a Class<Serializable>, not an instanced object
 
-    public Migrator(){
+    public PostGreSQLMigrator(){
         this.migrations = new HashMap<UUID, AbstractMigration>();
         this.objects = new ArrayList<Serializable>();
     }
@@ -35,7 +35,10 @@ public final class Migrator {
      * Registers a migration to be applied to the database
      *
      * @param migration
+     *
+     * {@see com.company.migration.IMigrator#registerMigration}
      */
+    @Override
     public void registerMigration(AbstractMigration migration){
         if(migrations.get(migration.getUUID()) == null){
             migrations.put(migration.getUUID(), migration);
@@ -59,7 +62,10 @@ public final class Migrator {
      *
      * @param conn Connection to a data source
      * @throws SQLException
-     */
+     *
+     * {@see com.company.migration.IMigrator#run}
+    */
+    @Override
     public void run(Connection conn) throws SQLException {
 
         //Ensure that the database has the Migration metadata required to perform
