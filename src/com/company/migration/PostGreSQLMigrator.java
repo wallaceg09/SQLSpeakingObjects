@@ -40,7 +40,7 @@ public final class PostGreSQLMigrator implements IMigrator{
      * {@see com.company.migration.IMigrator#registerMigration}
      */
     @Override
-    public void registerMigration(AbstractMigration migration){
+    public void registerMigration(AbstractMigration migration){//FIXME: Going to have to rethink this: the UUID that is generated will not match the UUID in the database.
         if(migrations.get(migration.getUUID()) == null){
             migrations.put(migration.getUUID(), migration);
         }
