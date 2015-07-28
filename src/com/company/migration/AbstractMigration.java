@@ -25,7 +25,7 @@ public abstract class AbstractMigration {
      * @param name The name of the migration. A good convention for naming migrations is to take the date that the migration
      *             was created in YYYYMMDDHHmm format and append an "_" followed by a brief description.
      *             For example a migration created on the date 07-27-2015 (MM-DD-YYY) at 6:37pm with the description
-     *             "Creates 'user' table" could be called "201507271837_CreateUserTable"
+     *             "Creates 'user' table" could be called "201507271837_CreateUserTable."
      */
     public AbstractMigration(String name){
         this.id = UUID.randomUUID();
@@ -42,7 +42,7 @@ public abstract class AbstractMigration {
     }
 
     /**
-     * Returns the name associated with this Migration
+     * Returns the name associated with this Migration.
      *
      * @return The name of the Migration.
      */
@@ -67,6 +67,11 @@ public abstract class AbstractMigration {
         this.applied = applied;
     }
 
+    /**
+     * Migration logic. This method should implement the changes desired in the database schema.
+     * @param conn
+     * @throws SQLException
+     */
     public abstract void up(Connection conn) throws SQLException;
 
 //    public abstract void down() throws SQLException;//TODO: Might implement later, but it's not important now

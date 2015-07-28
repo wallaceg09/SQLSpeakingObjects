@@ -9,7 +9,7 @@ import java.sql.SQLException;
 public interface IMigrator {
 
     /**
-     * Registers a migration to be applied to the database
+     * Registers a migration to be applied to the database.
      *
      * @param migration
      */
@@ -18,7 +18,7 @@ public interface IMigrator {
     /**
      * Migrates the database based on the registered {@link AbstractMigration}s.
      *
-     * @param conn Connection to a data source
+     * @param conn Connection to a data source.
      * @throws SQLException
      */
     public void run(Connection conn) throws SQLException;

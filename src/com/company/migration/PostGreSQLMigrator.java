@@ -33,7 +33,7 @@ public final class PostGreSQLMigrator implements IMigrator{
     }
 
     /**
-     * Registers a migration to be applied to the database
+     * Registers a migration to be applied to the database.
      *
      * @param migration
      *
@@ -47,7 +47,7 @@ public final class PostGreSQLMigrator implements IMigrator{
     }
 
     /**
-     * Registers a serializable object for migration control
+     * Registers a serializable object for migration control.
      *
      * @param object
      */
@@ -61,7 +61,7 @@ public final class PostGreSQLMigrator implements IMigrator{
      * Migrates the database based on the registered {@link AbstractMigration}s.
      * NOTE: This method does NOT close the connection. The connection must be closed in a higher scope.
      *
-     * @param conn Connection to a data source
+     * @param conn Connection to a data source.
      * @throws SQLException
      *
      * {@see com.company.migration.IMigrator#run}
@@ -83,9 +83,9 @@ public final class PostGreSQLMigrator implements IMigrator{
     }
 
     /**
-     * Collects all registered migrations that have not been applied to the database, and stores them into a list
+     * Collects all registered migrations that have not been applied to the database, and stores them into a list.
      *
-     * @return List of migrations that need to be applied to the database
+     * @return List of migrations that need to be applied to the database.
      * @throws SQLException
      */
     private List<AbstractMigration> getMigrationsNotApplied() {
@@ -103,7 +103,7 @@ public final class PostGreSQLMigrator implements IMigrator{
     /**
      * Marks all migrations that have already been applied to the database.
      *
-     * @param conn Connection to a data source
+     * @param conn Connection to a data source.
      * @throws SQLException
      */
     private void markAppliedMigrations(Connection conn) throws SQLException {
@@ -136,10 +136,10 @@ public final class PostGreSQLMigrator implements IMigrator{
     }
 
     /**
-     * Applies all migrations that have not already been applied to the database
+     * Applies all migrations that have not already been applied to the database.
      *
-     * @param conn Connection to a data source
-     * @param migrationsNotApplied List of migrations that have not been applied to the database
+     * @param conn Connection to a data source.
+     * @param migrationsNotApplied List of migrations that have not been applied to the database.
      * @throws SQLException
      */
     private void applyMigrations(Connection conn, List<AbstractMigration> migrationsNotApplied)throws SQLException{
@@ -177,7 +177,14 @@ public final class PostGreSQLMigrator implements IMigrator{
         conn.commit();
     }
 
-    private void validateMigrationsTable(Connection conn)throws SQLException{//FIXME: Make private after testing
+    /**
+     * Creates the table that holds the migrations that have been applied to the database, if the table does not exist
+     * already.
+     *
+     * @param conn Connection to a data source.
+     * @throws SQLException
+     */
+    private void validateMigrationsTable(Connection conn)throws SQLException{
         //Create migration table if it does not exist
         PreparedStatement pstmt = conn.prepareStatement(CREATE_MIGRATION_TABLE_QUERYSTRING);
         try{
