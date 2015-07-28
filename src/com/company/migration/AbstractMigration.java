@@ -21,6 +21,12 @@ public abstract class AbstractMigration {
 
     private boolean applied;//Should not be persisted to the database.
 
+    /**
+     * @param name The name of the migration. A good convention for naming migrations is to take the date that the migration
+     *             was created in YYYYMMDDHHmm format and append an "_" followed by a brief description.
+     *             For example a migration created on the date 07-27-2015 (MM-DD-YYY) at 6:37pm with the description
+     *             "Creates 'user' table" could be called "201507271837_CreateUserTable"
+     */
     public AbstractMigration(String name){
         this.id = UUID.randomUUID();
         this.name = name;
@@ -34,6 +40,13 @@ public abstract class AbstractMigration {
     public UUID getUUID(){
         return id;
     }
+
+    /**
+     * Returns the name associated with this Migration
+     *
+     * @return The name of the Migration.
+     */
+    public String getName() { return name; }
 
     /**
      * Get whether or not the migration has already been applied to the database.

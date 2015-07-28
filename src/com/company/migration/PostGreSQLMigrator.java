@@ -11,12 +11,13 @@ import java.util.*;
  * Created by Glen on 7/26/2015.
  */
 //TODO: Convert connections to pooled connections
-//TODO: Create Migrator interface, and then refacter this name to PostGresMigrator or summat
 public final class PostGreSQLMigrator implements IMigrator{
 
     private static final String MIGRATION_TABLE_NAME = "Migrations";
 
     private static final String APPLIED_MIGRATIONS_QUERYSTRING = "SELECT \"id\" from \"" + MIGRATION_TABLE_NAME +"\"";
+
+    private static final String INSERT_MIGRATION_QUERYSTRING = "INSERT INTO \"" + MIGRATION_TABLE_NAME +  "\" (\"id\", \"name\") values (?, ?)";
 
 //    private static final String MIGRATION_TABLE_EXISTS_QUERYSTRING = "SELECT EXISTS(SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = ? and c.relname = ?)";//TODO: Most likely not needed
 
@@ -149,7 +150,23 @@ public final class PostGreSQLMigrator implements IMigrator{
                 //Apply migration
                 migration.up(conn);
 
+                //TODO: Move saving the migration metadata to its own method.
                 //Log migration in migration file
+                PreparedStatement pstmt = conn.prepareStatement(INSERT_MIGRATION_QUERYSTRING);
+                pstmt.setObject(1, migration.getUUID());
+                pstmt.setString(2, migration.getName());
+
+                try{
+                    pstmt.executeUpdate();
+                }catch(SQLException sqle){
+                    throw new SQLException(sqle);
+                }finally {
+                    try{
+                        pstmt.close();
+                    }catch(SQLException sqle){
+                        //TODO: Log exception
+                    }
+                }
             }catch (SQLException sqle){
                 //Rollback and throw an exception if there is an error
                 conn.rollback();
