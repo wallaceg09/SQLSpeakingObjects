@@ -13,22 +13,24 @@ import java.util.*;
 //TODO: Convert connections to pooled connections
 public final class PostGreSQLMigrator implements IMigrator{
 
-    private static final String MIGRATION_TABLE_NAME = "Migrations";
+    private static final String MIGRATION_TABLE_NAME = "__MigrationHistory";
 
-    private static final String APPLIED_MIGRATIONS_QUERYSTRING = "SELECT \"id\" from \"" + MIGRATION_TABLE_NAME +"\"";
+    private static final String APPLIED_MIGRATIONS_QUERYSTRING = "SELECT \"id\", \"name\" FROM \"" + MIGRATION_TABLE_NAME +"\"";//FIXME: Only need the names
 
-    private static final String INSERT_MIGRATION_QUERYSTRING = "INSERT INTO \"" + MIGRATION_TABLE_NAME +  "\" (\"id\", \"name\") values (?, ?)";
+    private static final String INSERT_MIGRATION_QUERYSTRING = "INSERT INTO \"" + MIGRATION_TABLE_NAME +  "\" (\"id\", \"name\") VALUES (?, ?)";
 
 //    private static final String MIGRATION_TABLE_EXISTS_QUERYSTRING = "SELECT EXISTS(SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = ? and c.relname = ?)";//TODO: Most likely not needed
 
-    private static final String CREATE_MIGRATION_TABLE_QUERYSTRING = "CREATE TABLE IF NOT EXISTS \"" + MIGRATION_TABLE_NAME + "\" (id uuid, name character varying, PRIMARY KEY(id))";
+    private static final String CREATE_MIGRATION_TABLE_QUERYSTRING = "CREATE TABLE IF NOT EXISTS \"" + MIGRATION_TABLE_NAME + "\" (id uuid, name character varying UNIQUE, PRIMARY KEY(id))";
 
-    private Map<UUID, AbstractMigration> migrations;//Map for fast indexing based on the UUID
+    private Map<String, AbstractMigration> migrationMap;//Map for fast indexing based on the UUID//TODO: Remove?
+    private Set<AbstractMigration> migrations;
 
     private List<Serializable> objects;//TODO: This should take a Class<Serializable>, not an instanced object
 
     public PostGreSQLMigrator(){
-        this.migrations = new HashMap<UUID, AbstractMigration>();
+        this.migrations = new HashSet<AbstractMigration>();
+        this.migrationMap = new TreeMap<String, AbstractMigration>();
         this.objects = new ArrayList<Serializable>();
     }
 
@@ -41,8 +43,11 @@ public final class PostGreSQLMigrator implements IMigrator{
      */
     @Override
     public void registerMigration(AbstractMigration migration){//FIXME: Going to have to rethink this: the UUID that is generated will not match the UUID in the database.
-        if(migrations.get(migration.getUUID()) == null){
-            migrations.put(migration.getUUID(), migration);
+        if(!migrations.contains(migration))
+        {
+            migrations.add(migration);
+        }else{
+            throw new RuntimeException("Migration names must be unique.");
         }
     }
 
@@ -73,10 +78,10 @@ public final class PostGreSQLMigrator implements IMigrator{
         validateMigrationsTable(conn);
 
         //Determine which migrations have been applied to the database
-        markAppliedMigrations(conn);
+        Set<String> appliedMigrations = getMigrationsInDatabase(conn);
 
         //Get all migrations that have not been applied to the database
-        List<AbstractMigration> migrationsNotApplied = getMigrationsNotApplied();
+        List<AbstractMigration> migrationsNotApplied = getMigrationsNotApplied(appliedMigrations);
 
         //Apply all migrations that have not been applied to the database
         applyMigrations(conn, migrationsNotApplied);
@@ -88,51 +93,17 @@ public final class PostGreSQLMigrator implements IMigrator{
      * @return List of migrations that need to be applied to the database.
      * @throws SQLException
      */
-    private List<AbstractMigration> getMigrationsNotApplied() {
+    private List<AbstractMigration> getMigrationsNotApplied(Set<String> appliedMigrations){
         LinkedList<AbstractMigration> migrationsNotApplied = new LinkedList<AbstractMigration>();
 
-        for(AbstractMigration migration : migrations.values()){
-            if(!migration.isApplied()){
-                migrationsNotApplied.add(migration);
+        for(AbstractMigration migration : migrations){
+            if(!appliedMigrations.contains(migration.getName())){
+                migration.generateId();
+                migrationsNotApplied.add((migration));
             }
         }
 
         return migrationsNotApplied;
-    }
-
-    /**
-     * Marks all migrations that have already been applied to the database.
-     *
-     * @param conn Connection to a data source.
-     * @throws SQLException
-     */
-    private void markAppliedMigrations(Connection conn) throws SQLException {
-        conn.setAutoCommit(false);
-        //Get the migrations that have already been applied to the database
-        PreparedStatement pstmt = conn.prepareStatement(APPLIED_MIGRATIONS_QUERYSTRING);
-        try{
-            ResultSet rset = pstmt.executeQuery();
-            try{
-                //Mark every migration that has been applied
-                while(rset.next()){
-                    UUID id = (UUID)rset.getObject(1);
-                    migrations.get(id).setApplied(true);
-                }
-            }catch(SQLException sqle){
-                throw new SQLException(sqle);
-            }finally{
-                rset.close();
-            }
-        }catch(SQLException sqle){
-            throw new SQLException(sqle);
-        }finally{
-            try{
-                pstmt.close();
-            }
-            catch (SQLException sqle){
-                //TODO: Log exception
-            }
-        }
     }
 
     /**
@@ -153,7 +124,7 @@ public final class PostGreSQLMigrator implements IMigrator{
                 //TODO: Move saving the migration metadata to its own method.
                 //Log migration in migration file
                 PreparedStatement pstmt = conn.prepareStatement(INSERT_MIGRATION_QUERYSTRING);
-                pstmt.setObject(1, migration.getUUID());
+                pstmt.setObject(1, migration.getId());
                 pstmt.setString(2, migration.getName());
 
                 try{
@@ -198,6 +169,35 @@ public final class PostGreSQLMigrator implements IMigrator{
                 //TODO: Log exception
             }
         }
+    }
+
+    private Set<String> getMigrationsInDatabase(Connection conn)throws SQLException
+    {
+        Set<String> result = new HashSet<String>();
+        PreparedStatement pstmt = conn.prepareStatement(APPLIED_MIGRATIONS_QUERYSTRING);
+        try{
+            ResultSet rset = pstmt.executeQuery();
+            try{
+                while(rset.next()){
+                    String name = rset.getString("name");
+                    result.add(name);
+                }
+            }catch(SQLException sqle){
+                throw new SQLException(sqle);
+            }finally{
+                rset.close();
+            }
+        }catch(SQLException sqle){
+            throw new SQLException(sqle);
+        }finally{
+            try{
+                pstmt.close();
+            }
+            catch (SQLException sqle){
+                //TODO: Log exception
+            }
+        }
+        return result;
     }
 
 }

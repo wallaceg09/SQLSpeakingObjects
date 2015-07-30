@@ -26,9 +26,12 @@ public abstract class AbstractMigration {
      *             was created in YYYYMMDDHHmm format and append an "_" followed by a brief description.
      *             For example a migration created on the date 07-27-2015 (MM-DD-YYY) at 6:37pm with the description
      *             "Creates 'user' table" could be called "201507271837_CreateUserTable."
+     *
+     *             It is important to note that the names of migrations MUST be unique. The convention mentioned makes
+     *             name conflicts very unlikely.
      */
     public AbstractMigration(String name){
-        this.id = UUID.randomUUID();
+//        this.id = UUID.randomUUID();
         this.name = name;
     }
 
@@ -37,8 +40,17 @@ public abstract class AbstractMigration {
      *
      * @return The {@link UUID}of the Migration.
      */
-    public UUID getUUID(){
+    public UUID getId(){
         return id;
+    }
+
+    void setId(UUID id){
+        this.id = id;
+    }
+
+    void generateId()
+    {
+        this.id = UUID.randomUUID();
     }
 
     /**
@@ -76,4 +88,20 @@ public abstract class AbstractMigration {
 
 //    public abstract void down() throws SQLException;//TODO: Might implement later, but it's not important now
 
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AbstractMigration that = (AbstractMigration) o;
+
+        return name.equals(that.name);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
 }

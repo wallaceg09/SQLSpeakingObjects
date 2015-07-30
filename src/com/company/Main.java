@@ -1,5 +1,6 @@
 package com.company;
 
+import com.company.Migrations.SecondTestMigration;
 import com.company.Migrations.TestMigration;
 import com.company.migration.PostGreSQLMigrator;
 import org.postgresql.ds.PGConnectionPoolDataSource;
@@ -16,6 +17,7 @@ public class Main {
 
         PostGreSQLMigrator migrator = new PostGreSQLMigrator();
         migrator.registerMigration(new TestMigration());
+        migrator.registerMigration(new SecondTestMigration());
 
         Connection conn = null;
         try {
