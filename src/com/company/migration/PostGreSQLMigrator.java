@@ -23,14 +23,12 @@ public final class PostGreSQLMigrator implements IMigrator{
 
     private static final String CREATE_MIGRATION_TABLE_QUERYSTRING = "CREATE TABLE IF NOT EXISTS \"" + MIGRATION_TABLE_NAME + "\" (id uuid, name character varying UNIQUE, PRIMARY KEY(id))";
 
-    private Map<String, AbstractMigration> migrationMap;//Map for fast indexing based on the UUID//TODO: Remove?
     private Set<AbstractMigration> migrations;
 
     private List<Serializable> objects;//TODO: This should take a Class<Serializable>, not an instanced object
 
     public PostGreSQLMigrator(){
-        this.migrations = new HashSet<AbstractMigration>();
-        this.migrationMap = new TreeMap<String, AbstractMigration>();
+        this.migrations = new HashSet<AbstractMigration>();//TODO: See if this maintains ordering. If not then HashSet should be dropped for another set implementation.
         this.objects = new ArrayList<Serializable>();
     }
 
@@ -42,7 +40,7 @@ public final class PostGreSQLMigrator implements IMigrator{
      * {@see com.company.migration.IMigrator#registerMigration}
      */
     @Override
-    public void registerMigration(AbstractMigration migration){//FIXME: Going to have to rethink this: the UUID that is generated will not match the UUID in the database.
+    public void registerMigration(AbstractMigration migration){
         if(!migrations.contains(migration))
         {
             migrations.add(migration);
@@ -171,6 +169,13 @@ public final class PostGreSQLMigrator implements IMigrator{
         }
     }
 
+    /**
+     * Retrieves all the migrations that have been applied to the database.
+     *
+     * @param conn Connection to a data source.
+     * @return Set of the names of migrations that have been applied to the database already.
+     * @throws SQLException
+     */
     private Set<String> getMigrationsInDatabase(Connection conn)throws SQLException
     {
         Set<String> result = new HashSet<String>();
