@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * Created by Glen on 7/26/2015.
@@ -13,13 +14,13 @@ import java.util.*;
 //TODO: Convert connections to pooled connections
 public final class PostGreSQLMigrator implements IMigrator{
 
+    private static Logger LOGGER = Logger.getLogger(PostGreSQLMigrator.class.getName());
+
     private static final String MIGRATION_TABLE_NAME = "__MigrationHistory";
 
     private static final String APPLIED_MIGRATIONS_QUERYSTRING = "SELECT \"id\", \"name\" FROM \"" + MIGRATION_TABLE_NAME +"\"";//FIXME: Only need the names
 
     private static final String INSERT_MIGRATION_QUERYSTRING = "INSERT INTO \"" + MIGRATION_TABLE_NAME +  "\" (\"id\", \"name\") VALUES (?, ?)";
-
-//    private static final String MIGRATION_TABLE_EXISTS_QUERYSTRING = "SELECT EXISTS(SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = ? and c.relname = ?)";//TODO: Most likely not needed
 
     private static final String CREATE_MIGRATION_TABLE_QUERYSTRING = "CREATE TABLE IF NOT EXISTS \"" + MIGRATION_TABLE_NAME + "\" (id uuid, name character varying UNIQUE, PRIMARY KEY(id))";
 
@@ -119,8 +120,7 @@ public final class PostGreSQLMigrator implements IMigrator{
                 //Apply migration
                 migration.up(conn);
 
-                //TODO: Move saving the migration metadata to its own method.
-                //Log migration in migration file
+                //Log migration in migration table
                 PreparedStatement pstmt = conn.prepareStatement(INSERT_MIGRATION_QUERYSTRING);
                 pstmt.setObject(1, migration.getId());
                 pstmt.setString(2, migration.getName());
@@ -133,7 +133,7 @@ public final class PostGreSQLMigrator implements IMigrator{
                     try{
                         pstmt.close();
                     }catch(SQLException sqle){
-                        //TODO: Log exception
+                        LOGGER.severe(sqle.getMessage());
                     }
                 }
             }catch (SQLException sqle){
@@ -164,7 +164,7 @@ public final class PostGreSQLMigrator implements IMigrator{
             try{
                 pstmt.close();
             }catch(SQLException sqle){
-                //TODO: Log exception
+                LOGGER.severe(sqle.getMessage());
             }
         }
     }
@@ -190,7 +190,13 @@ public final class PostGreSQLMigrator implements IMigrator{
             }catch(SQLException sqle){
                 throw new SQLException(sqle);
             }finally{
-                rset.close();
+                try{
+                    rset.close();
+                }catch(SQLException sqle)
+                {
+                    LOGGER.severe(sqle.getMessage());
+                }
+
             }
         }catch(SQLException sqle){
             throw new SQLException(sqle);
@@ -199,7 +205,7 @@ public final class PostGreSQLMigrator implements IMigrator{
                 pstmt.close();
             }
             catch (SQLException sqle){
-                //TODO: Log exception
+                LOGGER.severe(sqle.getMessage());
             }
         }
         return result;

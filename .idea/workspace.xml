@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="58c963e3-e239-4a63-82aa-ae62ace95122" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/company/migration/PostGreSQLMigrator.java" afterPath="$PROJECT_DIR$/src/com/company/migration/PostGreSQLMigrator.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="SQLSpeakingObjects.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -74,12 +73,12 @@
       <file leaf-file-name="PostGreSQLMigrator.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/com/company/migration/PostGreSQLMigrator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-1.3957996">
-              <caret line="30" column="168" selection-start-line="30" selection-start-column="168" selection-end-line="30" selection-end-column="168" />
+            <state vertical-scroll-proportion="0.20169492">
+              <caret line="121" column="0" selection-start-line="121" selection-start-column="0" selection-end-line="121" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#3699#3718#0" expanded="true" />
-                <element signature="e#6711#6719#0" expanded="true" />
+                <element signature="e#3571#3590#0" expanded="true" />
+                <element signature="e#6530#6538#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -468,8 +467,8 @@
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32953367" sideWeight="0.5154584" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32919255" sideWeight="0.4978678" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21268657" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.22761194" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21268657" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.22761194" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
@@ -523,25 +522,25 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/com/company/migration/PostGreSQLMigrator.java</url>
-          <line>89</line>
+          <line>90</line>
           <properties />
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/com/company/migration/PostGreSQLMigrator.java</url>
-          <line>62</line>
+          <line>63</line>
           <properties />
           <option name="timeStamp" value="8" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/com/company/migration/PostGreSQLMigrator.java</url>
-          <line>33</line>
+          <line>34</line>
           <properties />
           <option name="timeStamp" value="9" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/com/company/migration/PostGreSQLMigrator.java</url>
-          <line>115</line>
+          <line>116</line>
           <properties />
           <option name="timeStamp" value="10" />
         </line-breakpoint>
@@ -599,8 +598,8 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#3699#3718#0" expanded="true" />
-            <element signature="e#6711#6719#0" expanded="true" />
+            <element signature="e#3571#3590#0" expanded="true" />
+            <element signature="e#6530#6538#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -639,8 +638,8 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#3699#3718#0" expanded="true" />
-            <element signature="e#6711#6719#0" expanded="true" />
+            <element signature="e#3571#3590#0" expanded="true" />
+            <element signature="e#6530#6538#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -824,12 +823,12 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/company/migration/PostGreSQLMigrator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-1.3957996">
-          <caret line="30" column="168" selection-start-line="30" selection-start-column="168" selection-end-line="30" selection-end-column="168" />
+        <state vertical-scroll-proportion="0.20169492">
+          <caret line="121" column="0" selection-start-line="121" selection-start-column="0" selection-end-line="121" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#3699#3718#0" expanded="true" />
-            <element signature="e#6711#6719#0" expanded="true" />
+            <element signature="e#3571#3590#0" expanded="true" />
+            <element signature="e#6530#6538#0" expanded="true" />
           </folding>
         </state>
       </provider>
